@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\BattleLineGame;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -10,7 +11,10 @@ class ExecuteBattleLineActionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        /** @var BattleLineGame $game */
+        $game = $this->route('battleLineGame');
+
+        return $this->user()?->can('act', $game) ?? false;
     }
 
     /**
@@ -19,7 +23,6 @@ class ExecuteBattleLineActionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'player_id' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', Rule::in(['play_troop', 'claim_flag', 'pass', 'finish_turn'])],
             'card_id' => [
                 Rule::requiredIf(fn (): bool => $this->input('type') === 'play_troop'),

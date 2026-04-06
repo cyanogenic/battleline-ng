@@ -13,9 +13,10 @@ final class GameStateViewProjector
 
     /**
      * @param  array<string, mixed>  $state
+     * @param  array<string, string>  $playerNames
      * @return array<string, mixed>
      */
-    public function project(array $state, ?string $viewerPlayerId): array
+    public function project(array $state, ?string $viewerPlayerId, array $playerNames = []): array
     {
         $deserializedState = $this->serializer->deserialize($state);
         $viewer = $viewerPlayerId !== null ? ($state['players'][$viewerPlayerId] ?? null) : null;
@@ -31,6 +32,7 @@ final class GameStateViewProjector
             $flags[] = [
                 'index' => $flag['index'],
                 'claimed_by' => $flag['claimed_by'],
+                'claimed_by_name' => $flag['claimed_by'] === null ? null : $this->playerName($playerNames, $flag['claimed_by']),
                 'claimed_by_viewer' => $flag['claimed_by'] === $viewerPlayerId,
                 'claimed_by_opponent' => $flag['claimed_by'] === $opponentPlayerId,
                 'viewer_cards' => $viewerCards,
@@ -43,14 +45,17 @@ final class GameStateViewProjector
         return [
             'turn' => [
                 'active_player_id' => $state['active_player_id'],
+                'active_player_name' => $this->playerName($playerNames, $state['active_player_id']),
                 'phase' => $state['phase'],
                 'next_play_order' => $state['next_play_order'],
                 'troop_deck_count' => count($state['troop_deck']),
                 'winner_id' => $state['winner_id'],
+                'winner_name' => $state['winner_id'] === null ? null : $this->playerName($playerNames, $state['winner_id']),
                 'is_viewer_active' => $viewerPlayerId !== null && $state['active_player_id'] === $viewerPlayerId,
             ],
             'viewer' => $viewer === null ? null : [
                 'player_id' => $viewer['player_id'],
+                'player_name' => $this->playerName($playerNames, $viewer['player_id']),
                 'hand' => $viewer['hand'],
                 'hand_count' => count($viewer['hand']),
                 'claimed_flags' => $viewer['claimed_flags'],
@@ -58,6 +63,7 @@ final class GameStateViewProjector
             ],
             'opponent' => $opponent === null ? null : [
                 'player_id' => $opponent['player_id'],
+                'player_name' => $this->playerName($playerNames, $opponent['player_id']),
                 'hand' => null,
                 'hand_count' => count($opponent['hand']),
                 'claimed_flags' => $opponent['claimed_flags'],
@@ -76,5 +82,13 @@ final class GameStateViewProjector
                 'can_finish_turn' => $this->engine->canFinishTurn($deserializedState, $viewerPlayerId),
             ],
         ];
+    }
+
+    /**
+     * @param  array<string, string>  $playerNames
+     */
+    private function playerName(array $playerNames, string $playerId): string
+    {
+        return $playerNames[$playerId] ?? $playerId;
     }
 }

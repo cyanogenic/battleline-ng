@@ -2,18 +2,14 @@
 
 namespace App\Http\Requests;
 
-use App\Models\BattleLineGame;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ShowBattleLineGameRequest extends FormRequest
+class LoginRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        /** @var BattleLineGame $game */
-        $game = $this->route('battleLineGame');
-
-        return $this->user()?->can('view', $game) ?? false;
+        return true;
     }
 
     /**
@@ -21,6 +17,10 @@ class ShowBattleLineGameRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [];
+        return [
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'password' => ['required', 'string'],
+            'remember' => ['nullable', 'boolean'],
+        ];
     }
 }

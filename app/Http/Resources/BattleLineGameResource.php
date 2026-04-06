@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Domain\Game\Support\GameStateViewProjector;
+use App\Models\BattleLineGame;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,14 +19,19 @@ class BattleLineGameResource extends JsonResource
 
     public function toArray(Request $request): array
     {
+        /** @var BattleLineGame $game */
+        $game = $this->resource;
+
         return [
-            'id' => $this->resource->id,
-            'player_one_name' => $this->resource->player_one_name,
-            'player_two_name' => $this->resource->player_two_name,
-            'status' => $this->resource->status,
-            'winner_name' => $this->resource->winner_name,
+            'id' => $game->id,
+            'player_one_name' => $game->player_one_name,
+            'player_two_name' => $game->player_two_name,
+            'status' => $game->status,
+            'winner_name' => $game->winner_name,
             'viewer_player_id' => $this->viewerPlayerId,
-            'state' => $this->projector->project($this->resource->state, $this->viewerPlayerId),
+            'state' => $game->hasStarted()
+                ? $this->projector->project($game->state, $this->viewerPlayerId, $game->seatNameMap())
+                : null,
         ];
     }
 }

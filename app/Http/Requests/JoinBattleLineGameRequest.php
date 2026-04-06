@@ -7,11 +7,14 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
-class StoreBattleLineGameRequest extends FormRequest
+class JoinBattleLineGameRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('create', BattleLineGame::class) ?? false;
+        /** @var BattleLineGame $game */
+        $game = $this->route('battleLineGame');
+
+        return $this->user()?->can('join', $game) ?? false;
     }
 
     /**
@@ -38,7 +41,7 @@ class StoreBattleLineGameRequest extends FormRequest
                 if (BattleLineGame::query()->openForUser($user)->exists()) {
                     $validator->errors()->add(
                         'game',
-                        'You already have an open battle. Finish it before creating a new one.'
+                        'You already have an open battle. Finish it before joining another one.'
                     );
                 }
             },
