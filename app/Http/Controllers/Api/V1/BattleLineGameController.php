@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\BattleLine\CreateBattleLineGameAction;
+use App\Actions\BattleLine\ExecuteBattleLineAction;
 use App\Actions\BattleLine\JoinBattleLineGameAction;
 use App\Domain\Game\Support\GameStateViewProjector;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ExecuteBattleLineActionRequest;
 use App\Http\Requests\JoinBattleLineGameRequest;
 use App\Http\Requests\ShowBattleLineGameRequest;
 use App\Http\Requests\StoreBattleLineGameRequest;
@@ -54,6 +56,23 @@ class BattleLineGameController extends Controller
         return new BattleLineGameResource(
             resource: $battleLineGame->loadMissing(['playerOneUser', 'playerTwoUser', 'winnerUser']),
             viewerPlayerId: $battleLineGame->seatFor($user),
+            projector: $this->projector,
+        );
+    }
+
+    public function executeAction(
+        ExecuteBattleLineActionRequest $request,
+        BattleLineGame $battleLineGame,
+        ExecuteBattleLineAction $executeAction,
+    ): BattleLineGameResource {
+        /** @var User $user */
+        $user = $request->user();
+        $viewerPlayerId = $battleLineGame->seatFor($user);
+        $updatedGame = $executeAction->execute($battleLineGame, $user, $request->validated());
+
+        return new BattleLineGameResource(
+            resource: $updatedGame->loadMissing(['playerOneUser', 'playerTwoUser', 'winnerUser']),
+            viewerPlayerId: $viewerPlayerId,
             projector: $this->projector,
         );
     }

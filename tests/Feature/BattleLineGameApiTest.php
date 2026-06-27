@@ -43,10 +43,12 @@ test('a participant can execute a troop action from their authenticated seat', f
             'type' => 'play_troop',
             'card_id' => $cardId,
             'flag_index' => 0,
+            'state_version' => 0,
         ]);
 
     $response->assertSuccessful()
         ->assertJsonPath('data.viewer_player_id', BattleLineGame::PlayerOneSeat)
+        ->assertJsonPath('data.state_version', 1)
         ->assertJsonPath('data.state.turn.phase', 'claiming_flags')
         ->assertJsonPath('data.state.board.flags.0.viewer_cards.0.card.id', $cardId)
         ->assertJsonCount(6, 'data.state.viewer.hand')
@@ -56,6 +58,7 @@ test('a participant can execute a troop action from their authenticated seat', f
     $game->refresh();
 
     expect($game->status)->toBe('claiming_flags')
+        ->and($game->state_version)->toBe(1)
         ->and($game->state['players'][BattleLineGame::PlayerOneSeat]['hand'])->toHaveCount(6);
 });
 
@@ -72,6 +75,7 @@ test('non participants cannot read or act on a battle state', function () {
     $this->actingAs($stranger)
         ->postJson(route('battle-line-games.actions.store', $game), [
             'type' => 'pass',
+            'state_version' => 0,
         ])
         ->assertForbidden();
 });

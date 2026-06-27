@@ -17,6 +17,7 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
         Route::post('/games', [BattleLineGameController::class, 'store'])->name('games.store');
         Route::get('/games/{battleLineGame}', [BattleLineGameController::class, 'show'])->name('games.show');
         Route::post('/games/{battleLineGame}/join', [BattleLineGameController::class, 'join'])->name('games.join');
+        Route::post('/games/{battleLineGame}/actions', [BattleLineGameController::class, 'executeAction'])->name('games.actions.store');
         Route::post('/auth/logout', [AuthenticatedSessionController::class, 'destroy'])->name('auth.logout');
         Route::post('/auth/logout-all', [AuthenticatedSessionController::class, 'destroyAll'])->name('auth.logout-all');
     });

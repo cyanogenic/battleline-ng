@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'player_one_name',
     'player_two_name',
     'status',
+    'state_version',
     'winner_user_id',
     'winner_name',
     'state',
@@ -35,6 +36,7 @@ class BattleLineGame extends Model
             'player_one_user_id' => 'integer',
             'player_two_user_id' => 'integer',
             'winner_user_id' => 'integer',
+            'state_version' => 'integer',
             'state' => 'array',
         ];
     }

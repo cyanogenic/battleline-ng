@@ -27,6 +27,7 @@ class BattleLineGameResource extends JsonResource
             'player_one_name' => $game->player_one_name,
             'player_two_name' => $game->player_two_name,
             'status' => $game->status,
+            'state_version' => $game->state_version,
             'winner_name' => $game->winner_name,
             'viewer_player_id' => $this->viewerPlayerId,
             'state' => $game->hasStarted()

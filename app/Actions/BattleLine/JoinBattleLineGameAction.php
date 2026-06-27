@@ -59,6 +59,7 @@ class JoinBattleLineGameAction
                 'player_two_user_id' => $joiningUser->getKey(),
                 'player_two_name' => $joiningUser->name,
                 'status' => $state->phase->value,
+                'state_version' => $lockedGame->state_version + 1,
                 'state' => $this->serializer->serialize($state),
             ])->save();
 

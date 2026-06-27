@@ -163,6 +163,10 @@ function setupBattleLineBoard() {
 
         state.busy = true;
         setAlert(elements.alert, 'Dispatching order to the front...', 'info');
+        const requestPayload = {
+            ...payload,
+            state_version: state.game?.state_version,
+        };
 
         try {
             const response = await fetch(app.dataset.actionUrl, {
@@ -173,7 +177,7 @@ function setupBattleLineBoard() {
                     'X-CSRF-TOKEN': csrfToken(),
                     'X-Requested-With': 'XMLHttpRequest',
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify(requestPayload),
             });
             const data = await response.json();
 
@@ -186,11 +190,11 @@ function setupBattleLineBoard() {
             state.hoverFlagIndex = null;
             state.draggingCardId = null;
 
-            if (payload.type === 'play_troop') {
+            if (requestPayload.type === 'play_troop') {
                 state.selectedCardId = null;
             }
 
-            state.lastMessage = actionSuccessMessage(payload);
+            state.lastMessage = actionSuccessMessage(requestPayload);
             setAlert(elements.alert, state.lastMessage, 'success');
             render();
         } catch (error) {

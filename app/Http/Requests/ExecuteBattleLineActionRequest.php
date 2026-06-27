@@ -24,6 +24,7 @@ class ExecuteBattleLineActionRequest extends FormRequest
     {
         return [
             'type' => ['required', 'string', Rule::in(['play_troop', 'claim_flag', 'pass', 'finish_turn'])],
+            'state_version' => ['required', 'integer', 'min:0'],
             'card_id' => [
                 Rule::requiredIf(fn (): bool => $this->input('type') === 'play_troop'),
                 'string',
