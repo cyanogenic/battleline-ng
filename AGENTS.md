@@ -51,6 +51,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.
+- API documentation lives in `/Users/cyan/Proj/battleline-ng/API.md`. Whenever any API route, authentication flow, request field, response payload, status code, error format, or rate limit changes, you must update `API.md` in the same change.
 
 ## Replies
 
