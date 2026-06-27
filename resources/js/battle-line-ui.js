@@ -13,6 +13,7 @@ const sidebarLayoutClasses = [
     'xl:grid-cols-[280px_minmax(0,1fr)_88px]',
     'xl:grid-cols-[88px_minmax(0,1fr)_88px]',
 ];
+const desktopSidebarMedia = window.matchMedia('(min-width: 1280px)');
 
 document.addEventListener('DOMContentLoaded', () => {
     setupBattleLineBoard();
@@ -90,6 +91,7 @@ function setupBattleLineBoard() {
 
         if (! state.game.state) {
             renderWaitingState(elements, state.game);
+            notifyBattleLineLayoutChange();
 
             return;
         }
@@ -103,6 +105,7 @@ function setupBattleLineBoard() {
         renderFeedback(elements.feedback, state);
         syncPlayerPanelState(elements, state.game.state.turn);
         syncInteractionState(elements, state);
+        notifyBattleLineLayoutChange();
     };
 
     const loadGame = async (silent = false) => {
@@ -251,7 +254,7 @@ function renderWaitingState(elements, game) {
         </p>
     `;
     elements.board.innerHTML = Array.from({ length: 9 }, (_, index) => `
-        <article class="flex basis-[min(15rem,calc((100%-2rem)/3))] shrink-0 snap-start flex-col rounded-3xl border border-white/10 bg-white/[0.045] p-3 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-4">
+        <article data-flag-card class="flex basis-[min(15rem,calc((100%-2rem)/3))] shrink-0 snap-start flex-col rounded-3xl border border-white/10 bg-white/[0.045] p-3 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-4">
             <p class="text-xs uppercase tracking-[0.24em] text-white/35">Flag ${index + 1}</p>
             <div class="mt-3 flex min-h-48 items-center justify-center rounded-2xl border border-dashed border-white/8 bg-black/15 px-3 text-[0.7rem] uppercase tracking-[0.2em] text-white/25 sm:mt-4 sm:min-h-56 sm:text-xs sm:tracking-[0.24em]">
                 Waiting For First Deployment
@@ -357,6 +360,7 @@ function renderBoard(container, state, postAction, elements) {
         return `
             <article
                 data-flag-target="${flag.index}"
+                data-flag-card
                 class="group relative flex basis-[min(15rem,calc((100%-2rem)/3))] shrink-0 snap-start flex-col rounded-3xl border ${status.borderClass} bg-white/[0.045] p-3 shadow-2xl shadow-black/20 ring-inset backdrop-blur-sm transition sm:p-4 ${flag.claimed_by_viewer ? 'ring-2 ring-war-gold/60' : ''} ${canPlayHere ? 'cursor-pointer' : ''} ${usesFocusedDropHighlight ? 'ring-2 ring-war-gold/45' : ''}"
             >
                 <div class="mb-3 flex flex-wrap items-start justify-between gap-3 sm:mb-4">
@@ -370,30 +374,31 @@ function renderBoard(container, state, postAction, elements) {
                     </div>
                 </div>
                 <div class="grid gap-3 sm:gap-4">
-                    <section class="rounded-2xl border border-white/8 bg-black/15 p-2.5 sm:p-3">
+                    <section data-flag-line="opponent" class="rounded-2xl border border-white/8 bg-black/15 p-2.5 sm:p-3">
                         <div class="mb-2 flex items-center justify-between text-[0.68rem] uppercase tracking-[0.2em] text-white/35 sm:text-xs sm:tracking-[0.24em]">
                             <span>Opponent Front</span>
                             <span>${flag.opponent_card_count}/3</span>
                         </div>
-                        <div class="flex min-h-24 gap-2 sm:min-h-28">
+                        <div data-flag-card-row="opponent" class="flex min-h-24 gap-2 sm:min-h-28">
                             ${renderPlacedCards(flag.opponent_cards, false)}
                         </div>
                     </section>
                     <button
                         type="button"
                         data-play-flag-hint="${flag.index}"
+                        data-flag-hint
                         aria-disabled="${canPlayHere ? 'false' : 'true'}"
                         class="rounded-2xl border border-dashed px-2.5 py-2 text-left text-xs transition sm:px-3 sm:text-sm ${usesFocusedDropHighlight ? 'border-war-gold/55 bg-war-gold/10 text-war-gold' : canPlayHere ? 'border-war-ember/70 bg-war-ember/12 text-war-ash hover:bg-war-ember/18' : 'border-white/8 bg-white/[0.03] text-white/45'}"
                     >
                         <span class="block text-[0.72rem] font-semibold sm:text-sm">${isPendingHere ? 'Deployment queued here' : status.hint}</span>
                         <span class="mt-1 block text-[0.68rem] text-white/40 sm:text-xs">${isPendingHere ? 'Confirm or cancel from Orders before the troop is committed.' : status.detail}</span>
                     </button>
-                    <section class="rounded-2xl border border-white/8 bg-black/15 p-2.5 sm:p-3">
+                    <section data-flag-line="viewer" class="rounded-2xl border border-white/8 bg-black/15 p-2.5 sm:p-3">
                         <div class="mb-2 flex items-center justify-between text-[0.68rem] uppercase tracking-[0.2em] text-white/35 sm:text-xs sm:tracking-[0.24em]">
                             <span>Your Line</span>
                             <span>${viewerCardCount}/3</span>
                         </div>
-                        <div class="flex min-h-24 gap-2 sm:min-h-28">
+                        <div data-flag-card-row="viewer" class="flex min-h-24 gap-2 sm:min-h-28">
                             ${renderPlacedCards(viewerCards, true)}
                         </div>
                     </section>
@@ -521,6 +526,7 @@ function renderHand(container, state, postAction, elements) {
             renderActions(document.querySelector('[data-actions]'), state, postAction, elements);
             renderFeedback(document.querySelector('[data-feedback]'), state);
             renderBoard(document.querySelector('[data-board]'), state, postAction, elements);
+            notifyBattleLineLayoutChange();
         });
 
         button.addEventListener('dragstart', (event) => {
@@ -839,7 +845,7 @@ function renderPlacedCards(cards, isViewerSide) {
     }
 
     return cards.map((entry) => `
-        <div class="flex h-20 min-w-0 basis-0 flex-1 flex-col justify-between rounded-[1rem] border ${entry.isPendingPreview ? 'border-war-gold/45' : 'border-white/10'} bg-gradient-to-b ${troopColorClasses[entry.card.color] ?? troopColorClasses.red} p-1.5 shadow-lg ${entry.isPendingPreview ? 'shadow-war-gold/20 ring-2 ring-war-gold/60' : 'shadow-black/20 ring-1 ring-black/15'} sm:h-24 sm:max-w-18 sm:rounded-[1.2rem] sm:p-2">
+        <div data-placed-card class="flex h-20 min-w-0 basis-0 flex-1 flex-col justify-between rounded-[1rem] border ${entry.isPendingPreview ? 'border-war-gold/45' : 'border-white/10'} bg-gradient-to-b ${troopColorClasses[entry.card.color] ?? troopColorClasses.red} p-1.5 shadow-lg ${entry.isPendingPreview ? 'shadow-war-gold/20 ring-2 ring-war-gold/60' : 'shadow-black/20 ring-1 ring-black/15'} sm:h-24 sm:max-w-18 sm:rounded-[1.2rem] sm:p-2">
             <span class="text-[0.48rem] font-bold uppercase tracking-[0.2em] opacity-80 sm:text-[0.55rem] sm:tracking-[0.24em]">${escapeHtml(entry.card.color)}</span>
             <span class="font-display text-2xl leading-none sm:text-3xl">${entry.card.strength}</span>
             <span class="text-right text-[0.48rem] font-semibold uppercase tracking-[0.2em] opacity-70 sm:text-[0.55rem] sm:tracking-[0.24em]">${entry.isPendingPreview ? 'Preview' : isViewerSide ? 'Yours' : 'Enemy'}</span>
@@ -1131,6 +1137,7 @@ function stagePlayCardToFlag(state, elements, postAction, flagIndex, cardId) {
     renderActions(elements.actions, state, postAction, elements);
     renderFeedback(elements.feedback, state);
     syncInteractionState(elements, state);
+    notifyBattleLineLayoutChange();
 }
 
 function confirmPendingDeployment(state, postAction) {
@@ -1204,6 +1211,7 @@ function cancelPendingDeployment(state, elements, postAction) {
     renderActions(elements.actions, state, postAction, elements);
     renderFeedback(document.querySelector('[data-feedback]'), state);
     syncInteractionState(elements, state);
+    notifyBattleLineLayoutChange();
 }
 
 function setupSidebarToggles(elements, state) {
@@ -1221,10 +1229,33 @@ function setupSidebarToggles(elements, state) {
         });
     });
 
+    desktopSidebarMedia.addEventListener('change', () => {
+        applySidebarState(elements, state);
+    });
+
     applySidebarState(elements, state);
 }
 
 function applySidebarState(elements, state) {
+    if (! desktopSidebarMedia.matches) {
+        elements.layout.classList.remove(...sidebarLayoutClasses);
+
+        ['left', 'right'].forEach((side) => {
+            elements.sidebars[side]?.setAttribute('data-collapsed', 'false');
+            elements.sidebarExpandedHeaders[side]?.classList.remove('hidden');
+            elements.sidebarPanels[side]?.classList.remove('hidden');
+            elements.sidebarCollapsedTriggers[side]?.classList.add('hidden');
+            elements.sidebarCollapsedTriggers[side]?.classList.remove('flex');
+            elements.sidebarShells[side]?.classList.remove('items-center', 'justify-center');
+        });
+
+        elements.sidebarToggles.forEach((button) => {
+            button.setAttribute('aria-expanded', 'true');
+        });
+
+        return;
+    }
+
     const leftCollapsed = state.collapsedSidebars.left;
     const rightCollapsed = state.collapsedSidebars.right;
 
@@ -1381,4 +1412,8 @@ function escapeHtml(value) {
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#39;');
+}
+
+function notifyBattleLineLayoutChange() {
+    window.dispatchEvent(new Event('battle-line:layout-change'));
 }

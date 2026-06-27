@@ -1236,3 +1236,69 @@
 **备注**
 
 - 这轮没有改变规则和动作接口，只重构了 `Field Intel` 的展示层和态势汇总逻辑。
+
+---
+
+### 33. 移动端横屏改成上下双层布局并增加实时缩放
+
+**本次目标**
+
+- 将移动端横屏改成顶部战线、底部 `Hand / Orders / Seats` 的双层作战台。
+- 通过实时缩放避免页面出现上下滚动，同时继续保住至少三条完整战线可见。
+
+**新增文件**
+
+- 无
+
+**修改文件**
+
+- `resources/views/components/layouts/battle-line.blade.php`
+- `resources/views/battle-line/show.blade.php`
+- `resources/css/app.css`
+- `resources/js/app.js`
+- `resources/js/battle-line-ui.js`
+- `tests/Feature/BattleLineGamePageTest.php`
+
+**关键接口 / 路由 / 命令**
+
+- 顶栏新增数据钩子：
+  - `data-battle-line-topbar-wrap`
+  - `data-battle-line-topbar`
+- 对局页主区域新增数据钩子：
+  - `data-battle-line-page`
+  - `data-battlefield-panel`
+  - `data-hand-shell`
+  - `data-orders-panel`
+  - `data-seats-panel`
+- 战线与卡牌渲染新增数据钩子：
+  - `data-flag-card`
+  - `data-flag-line`
+  - `data-flag-card-row`
+  - `data-flag-hint`
+  - `data-placed-card`
+- 移动端横屏布局规则新增到 `resources/css/app.css`：
+  - 顶栏压缩
+  - `Battlefield` 顶部整行
+  - 底部三栏 `Hand / Orders / Seats`
+  - 战线卡、已出牌卡、手牌卡的缩放覆盖
+- `resources/js/app.js` 新增：
+  - `setupBattleLineViewportScaling()`
+- 新增前端自定义事件：
+  - `battle-line:layout-change`
+  用于在战局内容变化后重新计算横屏缩放
+- `applySidebarState()` 现在在非桌面断点下会强制展示左右面板，不再继承桌面折叠状态
+- 页面断言改为覆盖新的双层布局标记和顺序：
+  - `Battlefield`
+  - `Your Hand`
+  - `Orders`
+  - `Seats`
+- 验证命令：
+  - `vendor/bin/pint --dirty --format agent`
+  - `php artisan test --compact tests/Feature/BattleLineGamePageTest.php`
+  - `php artisan test --compact`
+  - `npm run build`
+
+**备注**
+
+- 这轮主要是布局层和前端交互层重构，没有改动游戏规则、接口行为或数据库结构。
+- Laravel 文档检索这次仍尝试通过 `php artisan docs -- search ...` 进行，但当前环境会因为无法打开浏览器 URL 而失败，因此本轮继续以本地代码上下文为主完成实现。

@@ -129,6 +129,11 @@ test('a participant can open the live battle page from their own authenticated s
         ->assertSeeText('Seats')
         ->assertSeeText('Field Intel')
         ->assertSeeText('Live tactical read for all nine lines.')
+        ->assertSee('data-battle-line-page', false)
+        ->assertSee('data-battlefield-panel', false)
+        ->assertSee('data-hand-shell', false)
+        ->assertSee('data-orders-panel', false)
+        ->assertSee('data-seats-panel', false)
         ->assertSee('data-account-menu', false)
         ->assertSee('data-open-feedback-modal', false)
         ->assertSee('data-feedback-modal', false)
@@ -138,7 +143,7 @@ test('a participant can open the live battle page from their own authenticated s
         ->assertDontSeeText('Back')
         ->assertDontSeeText('Battle Line')
         ->assertDontSee('playing card')
-        ->assertSeeInOrder(['Orders', 'Battlefield', 'Seats'])
+        ->assertSeeInOrder(['Battlefield', 'Your Hand', 'Orders', 'Seats'])
         ->assertDontSee('Deployment preview')
         ->assertDontSee('View as');
 });

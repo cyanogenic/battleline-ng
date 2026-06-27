@@ -13,8 +13,8 @@
         <div class="relative isolate overflow-hidden">
             <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96 bg-[radial-gradient(circle_at_top,rgba(244,145,56,0.22),transparent_52%)]"></div>
             <div class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-80 bg-[radial-gradient(circle_at_bottom_right,rgba(245,200,98,0.14),transparent_50%)]"></div>
-            <div class="mx-auto w-full max-w-7xl px-5 pt-5 sm:px-8 lg:px-10">
-                <div class="relative z-40 flex flex-wrap items-center justify-between gap-4 overflow-visible rounded-full border border-white/10 bg-black/20 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md">
+            <div data-battle-line-topbar-wrap class="mx-auto w-full max-w-7xl px-5 pt-5 sm:px-8 lg:px-10">
+                <div data-battle-line-topbar class="relative z-40 flex flex-wrap items-center justify-between gap-4 overflow-visible rounded-full border border-white/10 bg-black/20 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md">
                     <a href="{{ route('battle-line-games.page.index') }}" class="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold uppercase tracking-[0.22em] text-white/72 transition hover:bg-white/[0.08] hover:text-white">
                         Command Hall
                     </a>

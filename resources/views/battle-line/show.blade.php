@@ -14,7 +14,7 @@
         </div>
     </x-slot:topbar>
 
-    <main class="flex min-h-screen w-full flex-col px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+    <main data-battle-line-page class="flex min-h-0 w-full flex-col px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
         <div class="pointer-events-none fixed inset-x-0 top-24 z-50 flex justify-center px-4 sm:px-6 lg:px-8">
             <div data-game-alert class="pointer-events-auto w-full max-w-2xl rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/60 shadow-2xl shadow-black/30 backdrop-blur-md transition duration-200">
                 <div class="flex items-start gap-3">
@@ -36,9 +36,30 @@
             data-viewer-player-id="{{ $viewerPlayerId }}"
             data-show-url="{{ route('battle-line-games.show', $game) }}"
             data-action-url="{{ route('battle-line-games.actions.store', $game) }}"
-            class="grid flex-1 gap-6 xl:min-h-[calc(100vh-11rem)] xl:grid-cols-[280px_minmax(0,1fr)_320px] xl:items-stretch"
+            class="grid flex-1 gap-6 xl:min-h-[calc(100vh-11rem)] xl:grid-rows-[minmax(0,1fr)_auto] xl:items-stretch"
         >
-            <aside data-sidebar="left" class="min-h-0 xl:h-full">
+            <section data-battlefield-panel class="flex min-h-0 flex-col rounded-[2rem] border border-white/10 bg-black/20 p-4 shadow-2xl shadow-black/20 backdrop-blur-md sm:p-5 xl:col-start-2 xl:row-start-1">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.28em] text-white/35">Battlefield</p>
+                        <h2 class="font-display text-3xl text-white">Nine contested flags</h2>
+                    </div>
+                    <p data-section-subtitle class="text-sm text-white/55">Choose a card, choose a flag, then confirm the deployment.</p>
+                </div>
+                <div data-board class="flex min-h-0 snap-x gap-4 overflow-x-auto px-1 py-1 pb-3"></div>
+            </section>
+
+            <section data-hand-shell class="flex min-h-0 flex-col rounded-[2rem] border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/20 backdrop-blur-sm xl:col-start-2 xl:row-start-2">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.28em] text-white/35">Your Hand</p>
+                        <h2 class="font-display text-3xl text-white">Choose your next formation</h2>
+                    </div>
+                </div>
+                <div data-hand class="flex min-h-0 gap-3 overflow-x-auto px-1 py-1 pb-3"></div>
+            </section>
+
+            <aside data-sidebar="left" data-orders-panel class="min-h-0 xl:col-start-1 xl:row-span-2 xl:h-full">
                 <div data-sidebar-shell="left" class="flex h-full min-h-0 flex-col rounded-[2rem] border border-white/10 bg-white/[0.045] p-4 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-5">
                     <div data-sidebar-expanded-header="left" class="grid gap-3">
                         <div class="flex items-start justify-between gap-4">
@@ -54,7 +75,7 @@
                             </button>
                         </div>
                         <h2 class="block w-full font-display text-3xl text-white">Orders</h2>
-                        <p class="text-sm leading-6 text-white/55">Track initiative and commit the next command without leaving the board.</p>
+                        <p data-section-subtitle class="text-sm leading-6 text-white/55">Track initiative and commit the next command without leaving the board.</p>
                     </div>
 
                     <button
@@ -85,30 +106,7 @@
                 </div>
             </aside>
 
-            <section class="flex min-h-0 flex-col gap-6 xl:h-full">
-                <section class="rounded-[2rem] border border-white/10 bg-black/20 p-4 shadow-2xl shadow-black/20 backdrop-blur-md sm:p-5">
-                    <div class="mb-4 flex items-center justify-between gap-3">
-                        <div>
-                            <p class="text-xs uppercase tracking-[0.28em] text-white/35">Battlefield</p>
-                            <h2 class="font-display text-3xl text-white">Nine contested flags</h2>
-                        </div>
-                        <p class="text-sm text-white/55">Choose a card, choose a flag, then confirm the deployment.</p>
-                    </div>
-                    <div data-board class="flex snap-x gap-4 overflow-x-auto px-1 py-1 pb-3"></div>
-                </section>
-
-                <section class="rounded-[2rem] border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/20 backdrop-blur-sm">
-                    <div class="mb-4 flex items-center justify-between gap-3">
-                        <div>
-                            <p class="text-xs uppercase tracking-[0.28em] text-white/35">Your Hand</p>
-                            <h2 class="font-display text-3xl text-white">Choose your next formation</h2>
-                        </div>
-                    </div>
-                    <div data-hand class="flex gap-3 overflow-x-auto px-1 py-1 pb-3"></div>
-                </section>
-            </section>
-
-            <aside data-sidebar="right" class="min-h-0 xl:h-full">
+            <aside data-sidebar="right" data-seats-panel class="min-h-0 xl:col-start-3 xl:row-span-2 xl:h-full">
                 <div data-sidebar-shell="right" class="flex h-full min-h-0 flex-col rounded-[2rem] border border-white/10 bg-white/[0.045] p-4 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-5">
                     <div data-sidebar-expanded-header="right" class="grid gap-3">
                         <div class="flex items-start justify-between gap-4">
@@ -124,7 +122,7 @@
                             </button>
                         </div>
                         <h2 class="block w-full font-display text-3xl text-white">Seats</h2>
-                        <p class="text-sm leading-6 text-white/55">Keep both commanders within easy sight while the battle unfolds.</p>
+                        <p data-section-subtitle class="text-sm leading-6 text-white/55">Keep both commanders within easy sight while the battle unfolds.</p>
                     </div>
 
                     <button
